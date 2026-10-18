@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Bản đồ ẩm thực — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="map-page">
+
+    <!-- Bản đồ full chiều cao -->
+    <div class="full-map-wrap" id="full-map" aria-label="Bản đồ ẩm thực TP. HCM">
+        <!-- Các ghim quán -->
+        {% for r in restaurants %}
+        <a href="{{ url_for('restaurant_detail', restaurant_id=r['id']) }}"
+           class="map-pin {% if r['is_featured'] %}map-pin--featured{% endif %}"
+           style="left:{{ loop.index * 9 + 5 }}%; top:{{ loop.index * 8 + 10 }}%"
+           title="{{ r['name'] }}"
+           aria-label="{{ r['name'] }}">
+            {% if r['is_featured'] %}❤️{% else %}📍{% endif %}
+            <span class="pin-label">{{ r['name'] }}</span>
+        </a>
+        {% endfor %}
+        <div class="map-bg-text">🗺 Bản đồ ẩm thực TP. Hồ Chí Minh</div>
+    </div>
+
+    <!-- Bảng chú thích (ảnh 08) -->
+    <div class="map-legend" role="note" aria-label="Chú thích bản đồ">
+        <h4>📖 Chú thích bản đồ</h4>
+        <div class="legend-row"><span>❤️</span><span>Quán nổi bật / đã yêu thích</span></div>
+        <div class="legend-row"><span>📍</span><span>Quán chưa từng tới (Kho báu)</span></div>
+        <div class="legend-row"><span>💔</span><span>Quán dở / không recommend</span></div>
+    </div>
+
+    <!-- Danh sách quán dạng side panel -->
+    <div class="map-side-list">
+        <h3>Danh sách quán</h3>
+        <div class="map-list-items">
+            {% for r in restaurants %}
+            <a href="{{ url_for('restaurant_detail', restaurant_id=r['id']) }}"
+               class="map-list-item">
+                <span class="map-list-emoji">
+                    {{ {'Món nước':'🍜','Lẩu & Nướng':'🍲','Hải sản':'🦞',
+                        'Ăn vặt':'🥢','Cơm':'🍚','Món chay':'🥗'}.get(r['food_type'], '🍽') }}
+                </span>
+                <div class="map-list-info">
+                    <strong>{{ r['name'] }}</strong>
+                    <span>★ {{ '%.1f'|format(r['rating']) }} · {{ r['district'] }}</span>
+                </div>
+                {% if r['is_featured'] %}<span class="map-list-badge">★</span>{% endif %}
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}{{ restaurant['name'] }} — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="detail-page">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb container" aria-label="Đường dẫn">
+        <a href="{{ url_for('home') }}">Trang chủ</a>
+        <span class="bc-sep">›</span>
+        <a href="{{ url_for('restaurants') }}">TP. HCM</a>
+        <span class="bc-sep">›</span>
+        <a href="{{ url_for('restaurants') }}?district={{ restaurant['district'] }}">{{ restaurant['district'] }}</a>
+        <span class="bc-sep">›</span>
+        <span>{{ restaurant['name'] }}</span>
+    </nav>
+
+    <div class="container detail-layout">
+
+        <!-- ══ CỘT TRÁI ══ -->
+        <div class="detail-main">
+
+            <h1 class="detail-name">{{ restaurant['name'] }}</h1>
+            <div class="detail-rating-row">
+                <span class="detail-stars">★ {{ '%.1f'|format(restaurant['rating']) }}</span>
+                <span class="detail-review-count">({{ restaurant['review_count'] }} đánh giá)</span>
+                {% if restaurant['is_featured'] %}
+                <span class="detail-badge-featured">★ Nổi bật</span>
+                {% endif %}
+                <span class="detail-open-status">🟢 Đang mở cửa</span>
+            </div>
+            <div class="detail-hours">⏰ {{ restaurant['opening_hours'] }}</div>
+
+            <!-- Lưới ảnh -->
+            <div class="detail-photo-grid">
+                <div class="photo-main">
+                    <span class="photo-emoji">
+                        {{ {'Món nước':'🍜','Lẩu & Nướng':'🍲','Hải sản':'🦞',
+                            'Ăn vặt':'🥢','Cơm':'🍚','Món chay':'🥗'}.get(restaurant['food_type'], '🍽') }}
+                    </span>
+                </div>
+                <div class="photo-side">
+                    <div class="photo-small"><span>🪑</span><p>Không gian</p></div>
+                    <div class="photo-small"><span>🧑‍🍳</span><p>Quầy bếp</p></div>
+                </div>
+            </div>
+
+            <!-- Thông tin -->
+            <div class="detail-info-box">
+                <div class="detail-info-row">
+                    <span class="info-icon">📍</span>
+                    <div><strong>Địa chỉ</strong><p>{{ restaurant['address'] }}</p></div>
+                </div>
+                <div class="detail-info-row">
+                    <span class="info-icon">💰</span>
+                    <div><strong>Mức giá</strong>
+                    <p>{{ restaurant['price_range'] }} — {{ '{:,}'.format(restaurant['price_min']) }}đ – {{ '{:,}'.format(restaurant['price_max']) }}đ / người</p></div>
+                </div>
+                {% if restaurant['phone'] %}
+                <div class="detail-info-row">
+                    <span class="info-icon">📞</span>
+                    <div><strong>Liên hệ</strong><p><a href="tel:{{ restaurant['phone'] }}">{{ restaurant['phone'] }}</a></p></div>
+                </div>
+                {% endif %}
+                {% if restaurant['description'] %}
+                <div class="detail-info-row">
+                    <span class="info-icon">ℹ️</span>
+                    <div><strong>Giới thiệu</strong><p>{{ restaurant['description'] }}</p></div>
+                </div>
+                {% endif %}
+            </div>
+
+            <a href="https://www.google.com/maps/search/?api=1&query={{ restaurant['address']|urlencode }}"
+               target="_blank" rel="noopener noreferrer" class="btn btn--primary btn-maps">
+                🗺 Chỉ đường trên Google Maps
+            </a>
+
+            <!-- Menu -->
+            {% if menu_items %}
+            <section class="detail-section">
+                <h2 class="detail-section-title">🍽 Thực đơn</h2>
+                <div class="menu-grid">
+                    {% for item in menu_items %}
+                    <div class="menu-item">
+                        <div class="menu-item-img">
+                            {{ {'Phở':'🍜','Bún':'🍜','Hủ tiếu':'🍜','Lẩu':'🍲',
+                                'Bánh mì':'🥖','Cà phê':'☕','Trà':'🧋',
+                                'Cơm':'🍚','Nước ngọt':'🥤','Quẩy':'🥐'
+                               }.get(item['name'].split()[0], '🍴') }}
+                        </div>
+                        <div class="menu-item-info">
+                            <span class="menu-item-name">{{ item['name'] }}</span>
+                            <span class="menu-item-price">{{ '{:,}'.format(item['price']) }}đ</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- ══ F2: ĐÁNH GIÁ ══ -->
+            <section class="detail-section" id="reviews">
+                <h2 class="detail-section-title">⭐ Đánh giá khách hàng</h2>
+
+                <!-- Thông báo -->
+                {% if review_success %}
+                <div class="auth-alert auth-alert--success" style="margin-bottom:1rem">
+                    ✅ Cảm ơn bạn đã đánh giá!
+                </div>
+                {% endif %}
+                {% if review_error %}
+                <div class="auth-alert auth-alert--error" style="margin-bottom:1rem">
+                    ⚠ {{ review_error }}
+                </div>
+                {% endif %}
+
+                <!-- Tổng quan -->
+                <div class="review-summary">
+                    <div class="review-score">
+                        <span class="score-big">{{ '%.1f'|format(avg_rating) }}</span>
+                        <div>
+                            <div class="score-stars">
+                                {% for i in range(1,6) %}
+                                    {% if i <= avg_rating|round(0,'floor')|int %}⭐
+                                    {% elif (avg_rating - avg_rating|int) >= 0.5 and i == avg_rating|int + 1 %}✨
+                                    {% else %}☆{% endif %}
+                                {% endfor %}
+                            </div>
+                            <span class="score-count">{{ total_reviews }} đánh giá</span>
+                        </div>
+                    </div>
+
+                    <!-- Biểu đồ phân bổ sao -->
+                    <div class="rating-bars">
+                        {% for star in [5,4,3,2,1] %}
+                        {% set cnt = star_counts.get(star, 0) %}
+                        {% set pct = (cnt / total_reviews * 100)|round|int if total_reviews > 0 else 0 %}
+                        <div class="rating-bar-row">
+                            <span class="bar-label">{{ star }}⭐</span>
+                            <div class="bar-track">
+                                <div class="bar-fill" style="width:{{ pct }}%"></div>
+                            </div>
+                            <span class="bar-count">{{ cnt }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Form viết đánh giá -->
+                {% if current_user %}
+                <div class="write-review-box">
+                    <h4>✏️ Viết đánh giá của bạn</h4>
+                    <form method="POST"
+                          action="{{ url_for('add_review', restaurant_id=restaurant['id']) }}">
+                        <!-- Chọn sao -->
+                        <div class="star-picker" id="star-picker">
+                            {% for s in [1,2,3,4,5] %}
+                            <button type="button" class="star-btn" data-value="{{ s }}"
+                                    aria-label="{{ s }} sao">☆</button>
+                            {% endfor %}
+                            <input type="hidden" name="rating" id="rating-input" value="" />
+                        </div>
+                        <textarea name="content" rows="3"
+                                  placeholder="Chia sẻ trải nghiệm của bạn về quán..."
+                                  maxlength="500" required></textarea>
+                        <button type="submit" class="btn btn--primary btn--sm">
+                            Gửi đánh giá
+                        </button>
+                    </form>
+                </div>
+                {% else %}
+                <p class="review-login-hint">
+                    <a href="{{ url_for('login') }}">Đăng nhập</a> để viết đánh giá.
+                </p>
+                {% endif %}
+
+                <!-- Danh sách đánh giá -->
+                <div class="review-list" style="margin-top:1.5rem">
+                    {% for rv in reviews %}
+                    <div class="review-card">
+                        <div class="review-avatar">{{ rv['username'][0]|upper }}</div>
+                        <div class="review-body">
+                            <div class="review-header">
+                                <strong>{{ rv['username'] }}</strong>
+                                <span class="review-stars">
+                                    {% for i in range(rv['rating']) %}⭐{% endfor %}
+                                </span>
+                            </div>
+                            <p class="review-content">{{ rv['content'] }}</p>
+                            <span class="review-date">{{ rv['created_at'][:10] }}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="no-reviews">Chưa có đánh giá nào. Hãy là người đầu tiên!</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+        </div><!-- /detail-main -->
+
+        <!-- ══ CỘT PHẢI ══ -->
+        <aside class="detail-sidebar">
+            <div class="sidebar-map">
+                <div class="map-placeholder map-placeholder--detail">
+                    <span class="map-placeholder-text">
+                        🗺<br/>
+                        <strong>{{ restaurant['name'] }}</strong><br/>
+                        <small>{{ restaurant['address'] }}</small>
+                    </span>
+                </div>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ restaurant['address']|urlencode }}"
+                   target="_blank" rel="noopener noreferrer"
+                   class="btn btn--primary" style="width:100%;margin-top:.75rem;text-align:center">
+                    🗺 Chỉ đường trên Google Maps
+                </a>
+            </div>
+            <div class="sidebar-quick-info">
+                <h3>Thông tin nhanh</h3>
+                <div class="quick-info-row"><span>🕐 Giờ mở cửa</span><strong>{{ restaurant['opening_hours'] }}</strong></div>
+                <div class="quick-info-row"><span>💰 Mức giá</span><strong>{{ restaurant['price_range'] }}</strong></div>
+                <div class="quick-info-row"><span>🍽 Loại món</span><strong>{{ restaurant['food_type'] }}</strong></div>
+                <div class="quick-info-row"><span>📍 Khu vực</span><strong>{{ restaurant['district'] }}</strong></div>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Chọn sao khi viết đánh giá
+const starBtns   = document.querySelectorAll('.star-btn');
+const ratingInput = document.getElementById('rating-input');
+if (starBtns.length) {
+    starBtns.forEach(btn => {
+        btn.addEventListener('mouseover', () => highlightStars(+btn.dataset.value));
+        btn.addEventListener('mouseout',  () => highlightStars(+(ratingInput.value||0)));
+        btn.addEventListener('click', () => {
+            ratingInput.value = btn.dataset.value;
+            highlightStars(+btn.dataset.value);
+        });
+    });
+}
+function highlightStars(n) {
+    starBtns.forEach((b, i) => { b.textContent = i < n ? '⭐' : '☆'; });
+}
+</script>
+{% endblock %}

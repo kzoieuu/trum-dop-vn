@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Hồ sơ cá nhân — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="profile-page container">
+
+    <div class="profile-layout">
+
+        <!-- ── Cột trái: thông tin tài khoản ── -->
+        <aside class="profile-sidebar">
+            <div class="profile-avatar">{{ user['username'][0]|upper }}</div>
+            <h2 class="profile-name">{{ user['username'] }}</h2>
+            <p class="profile-email">{{ user['email'] }}</p>
+            <p class="profile-since">Thành viên từ {{ user['created_at'][:10] }}</p>
+            <a href="{{ url_for('logout') }}" class="btn btn--outline btn--sm profile-logout">
+                Đăng xuất
+            </a>
+        </aside>
+
+        <!-- ── Cột phải: nội dung ── -->
+        <div class="profile-main">
+
+            <!-- Sở thích -->
+            <section class="profile-section">
+                <h3 class="profile-section-title">🍽 Sở thích ẩm thực</h3>
+                <form method="POST" action="{{ url_for('update_preferences') }}">
+                    <div class="pref-grid">
+                        {% for pref in ['Cay', 'Lẩu & Nướng', 'Ăn vặt', 'Món nước',
+                                        'Hải sản', 'Món chay', 'Cơm', 'Healthy / ít béo'] %}
+                        <label class="pref-chip {% if pref in preferences %}pref-chip--active{% endif %}">
+                            <input type="checkbox" name="preferences" value="{{ pref }}"
+                                   {% if pref in preferences %}checked{% endif %} />
+                            {{ pref }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <button type="submit" class="btn btn--primary btn--sm" style="margin-top:1rem">
+                        Lưu sở thích
+                    </button>
+                </form>
+                {% if pref_saved %}
+                <p class="pref-saved-msg">✅ Đã lưu sở thích!</p>
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
+</div>
+{% endblock %}

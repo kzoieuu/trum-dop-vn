@@ -1,0 +1,355 @@
+{% extends "base.html" %}
+
+{% block title %}Trang chủ — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+
+<!-- ═══════════════════════════════════════════════════════════
+     1. Ô TÌM KIẾM LỚN (ảnh 05)
+════════════════════════════════════════════════════════════ -->
+<section class="hero-search">
+    <div class="container">
+        <h1 class="hero-title">Hôm nay ăn gì? 🍜</h1>
+        <p class="hero-sub">Khám phá hàng trăm quán ngon tại TP. Hồ Chí Minh</p>
+        <div class="search-bar search-bar--large">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="hero-search-input"
+                   placeholder="Tìm món ăn, nhà hàng, quán cafe..." />
+            <button class="btn btn--primary">Tìm kiếm</button>
+        </div>
+
+        <!-- Nút lọc nhanh -->
+        <div class="quick-filters">
+            <button class="pill active">Tất cả</button>
+            <button class="pill">🍜 Phở</button>
+            <button class="pill">🍲 Lẩu / Nướng</button>
+            <button class="pill">🦞 Hải sản</button>
+            <button class="pill">🧋 Nước</button>
+            <button class="pill">🥢 Ăn vặt</button>
+            <button class="pill">🥗 Món chay</button>
+            <button class="pill">🍚 Cơm</button>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     2. DANH SÁCH QUÁN + BẢN ĐỒ (ảnh 05)
+════════════════════════════════════════════════════════════ -->
+<section class="restaurant-section container" id="kham-pha">
+    <div class="section-header">
+        <h2 class="section-title">
+            Quán ngon quanh bạn
+            <span class="count-badge">{{ total }} địa điểm</span>
+        </h2>
+        <div class="section-tabs">
+            <button class="tab-btn active" data-tab="popular">Xem nhiều nhất</button>
+            <button class="tab-btn" data-tab="recent">Gần đây</button>
+        </div>
+    </div>
+
+    <div class="content-columns">
+        <!-- Cột trái: danh sách thẻ quán dạng dọc -->
+        <div class="restaurant-list" id="restaurant-list">
+            {% for r in restaurants %}
+            <a href="{{ url_for('restaurant_detail', restaurant_id=r['id']) }}"
+               class="restaurant-card-h" aria-label="{{ r['name'] }}">
+                <div class="card-img">
+                    {% if r['image_url'] %}
+                        <img src="{{ r['image_url'] }}" alt="{{ r['name'] }}" />
+                    {% else %}
+                        {{ {'Món nước':'🍜','Lẩu & Nướng':'🍲','Hải sản':'🦞',
+                            'Ăn vặt':'🥢','Cơm':'🍚','Món chay':'🥗'}.get(r['food_type'], '🍽') }}
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    <div class="card-name">
+                        {{ r['name'] }}
+                        {% if r['is_featured'] %}
+                            <span class="card-featured">★ Nổi bật</span>
+                        {% endif %}
+                    </div>
+                    <div class="card-meta">
+                        <span class="card-rating">★ {{ '%.1f'|format(r['rating']) }}</span>
+                        <span style="color:#ccc"> · </span>
+                        <span>{{ r['review_count'] }} đánh giá</span>
+                        <span style="color:#ccc"> · </span>
+                        <span>{{ r['food_type'] }}</span>
+                    </div>
+                    <div class="card-meta">📍 {{ r['district'] }}</div>
+                    <div>
+                        {% if r['price_range'] == 'Bình dân' %}
+                            <span class="card-status card-status--open">Bình dân</span>
+                        {% elif r['price_range'] == 'Tầm trung' %}
+                            <span class="card-status" style="background:#e3f2fd;color:#1565c0">Tầm trung</span>
+                        {% else %}
+                            <span class="card-status" style="background:#f3e5f5;color:#6a1b9a">Cao cấp</span>
+                        {% endif %}
+                        <span class="card-status card-status--open" style="margin-left:.3rem">Đang mở cửa</span>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <p style="color:#999;padding:1rem;">Chưa có quán nào trong danh sách.</p>
+            {% endfor %}
+        </div>
+
+        <!-- Cột phải: bản đồ lớn -->
+        <div class="map-column">
+            <div class="map-placeholder" id="home-map" aria-label="Bản đồ quán ăn">
+                <span class="map-placeholder-text">🗺 Bản đồ<br/>
+                    <small>(Tính năng bản đồ sẽ được tích hợp ở bước sau)</small>
+                </span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     3. KHU VỰC KHÁM PHÁ — tích hợp mục "Khám phá" từ menu
+════════════════════════════════════════════════════════════ -->
+<section class="explore-section" id="kham-pha-section">
+    <div class="container">
+        <h2 class="section-title">🧭 Khám phá ẩm thực Sài Gòn</h2>
+        <p class="section-desc">Từng khu phố, từng con hẻm đều ẩn chứa hương vị riêng. Cùng khám phá!</p>
+        <div class="explore-grid">
+            <div class="explore-card">
+                <div class="explore-card-img explore-card-img--pho">🍜</div>
+                <h3>Phở &amp; Bún</h3>
+                <p>Món nước Việt Nam đậm đà bản sắc</p>
+                <a href="{{ url_for('restaurants') }}?food_type=Mon+nuoc" class="btn btn--outline btn--sm">Xem quán</a>
+            </div>
+            <div class="explore-card">
+                <div class="explore-card-img explore-card-img--lau">🍲</div>
+                <h3>Lẩu &amp; Nướng</h3>
+                <p>Tụ họp bạn bè, thưởng thức thả ga</p>
+                <a href="{{ url_for('restaurants') }}?food_type=Lau+%26+Nuong" class="btn btn--outline btn--sm">Xem quán</a>
+            </div>
+            <div class="explore-card">
+                <div class="explore-card-img explore-card-img--hai-san">🦞</div>
+                <h3>Hải sản</h3>
+                <p>Tươi sống, chế biến đa dạng</p>
+                <a href="{{ url_for('restaurants') }}?food_type=Hai+san" class="btn btn--outline btn--sm">Xem quán</a>
+            </div>
+            <div class="explore-card">
+                <div class="explore-card-img explore-card-img--an-vat">🥢</div>
+                <h3>Ăn vặt</h3>
+                <p>Bánh mì, chè, kem và đủ thứ ngon</p>
+                <a href="{{ url_for('restaurants') }}?food_type=An+vat" class="btn btn--outline btn--sm">Xem quán</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     4. ĐẶT BÀN — tích hợp mục "Đặt bàn" từ menu
+════════════════════════════════════════════════════════════ -->
+<section class="booking-section" id="dat-ban">
+    <div class="container">
+        <div class="booking-content">
+            <div class="booking-text">
+                <h2 class="section-title">🪑 Đặt bàn trước, không lo chờ đợi</h2>
+                <p>Tìm quán ưng ý, xem giờ mở cửa và gọi trực tiếp để đặt chỗ. Tiết kiệm thời gian, tận hưởng trọn vẹn bữa ăn.</p>
+                <ul class="booking-steps">
+                    <li><span class="step-num">1</span> Tìm quán theo loại món và khu vực</li>
+                    <li><span class="step-num">2</span> Xem thông tin chi tiết và đánh giá</li>
+                    <li><span class="step-num">3</span> Gọi điện hoặc nhắn tin đặt bàn trực tiếp</li>
+                    <li><span class="step-num">4</span> Đến tận nơi, thưởng thức!</li>
+                </ul>
+                <a href="{{ url_for('restaurants') }}" class="btn btn--primary">Tìm quán ngay</a>
+            </div>
+            <div class="booking-visual" aria-hidden="true">
+                <div class="booking-emoji-stack">
+                    <span>🍽</span><span>📅</span><span>✅</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     5. ƯU ĐÃI — tích hợp mục "Ưu đãi" từ menu
+════════════════════════════════════════════════════════════ -->
+<section class="promo-section" id="uu-dai">
+    <div class="container">
+        <h2 class="section-title">🎁 Ưu đãi &amp; Khuyến mãi</h2>
+        <p class="section-desc">Những deal ngon đang chờ bạn khám phá hôm nay</p>
+        <div class="promo-grid" id="promo-grid">
+            <!-- Placeholder — dữ liệu sẽ lấy từ DB (quán có nhãn khuyến mãi) -->
+            <div class="promo-card">
+                <div class="promo-badge">Giảm 10%</div>
+                <div class="promo-img promo-img--1">🍜</div>
+                <div class="promo-info">
+                    <h3>Phở Gia Truyền Phú Gia</h3>
+                    <p>Giảm 10% cho hoá đơn trên 100.000đ</p>
+                    <a href="{{ url_for('restaurants') }}" class="btn btn--primary btn--sm">Xem quán</a>
+                </div>
+            </div>
+            <div class="promo-card">
+                <div class="promo-badge">Giảm 15%</div>
+                <div class="promo-img promo-img--2">🍲</div>
+                <div class="promo-info">
+                    <h3>Lẩu Nướng Phố – Q.3</h3>
+                    <p>Giảm 15% dành cho nhóm từ 4 người</p>
+                    <a href="{{ url_for('restaurants') }}" class="btn btn--primary btn--sm">Xem quán</a>
+                </div>
+            </div>
+            <div class="promo-card">
+                <div class="promo-badge">Mua 1 tặng 1</div>
+                <div class="promo-img promo-img--3">🥖</div>
+                <div class="promo-info">
+                    <h3>Bánh mì &amp; Cà phê Ông Vy</h3>
+                    <p>Mua 1 bánh mì tặng 1 cà phê đen từ 7h–9h sáng</p>
+                    <a href="{{ url_for('restaurants') }}" class="btn btn--primary btn--sm">Xem quán</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     6. VÒ QUAY — lối vào nhanh (ảnh 05)
+════════════════════════════════════════════════════════════ -->
+<section class="spin-banner">
+    <div class="container">
+        <div class="spin-banner-inner">
+            <div class="spin-banner-text">
+                <h2>🎡 Không biết ăn gì?</h2>
+                <p>Để vòng quay quyết định giúp bạn! Chọn bữa, chọn khu vực — vòng quay lo phần còn lại.</p>
+                <a href="{{ url_for('spin') }}" class="btn btn--white">Thử ngay!</a>
+            </div>
+            <div class="spin-banner-visual" aria-hidden="true">🎡</div>
+        </div>
+    </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════
+     HỘP GỢI Ý CÁ NHÂN (F5)
+════════════════════════════════════════════════════════════ -->
+<!-- Dữ liệu quán để lọc phía client -->
+<script id="restaurants-data" type="application/json">
+{{ restaurants_json|safe }}
+</script>
+
+<div class="personal-hint-box" id="personal-hint-box" role="dialog"
+     aria-label="Gợi ý cá nhân" aria-modal="false">
+    <div class="hint-header">
+        <strong>✨ Gợi ý Cá nhân</strong>
+        <button class="hint-close" id="hint-close-btn" aria-label="Đóng hộp gợi ý">✕</button>
+    </div>
+    <p class="hint-sub">Dựa trên sở thích của bạn</p>
+
+    <div class="hint-group">
+        <h4>Sở thích</h4>
+        {% set pref_map = {
+            'Lẩu & Nướng': ('Lẩu & Nướng', 'Lẩu & nướng 🍲'),
+            'Ăn vặt':      ('Ăn vặt',       'Ăn vặt 🥢'),
+            'Món nước':    ('Món nước',      'Món nước 🍜'),
+            'Hải sản':     ('Hải sản',       'Hải sản 🦞'),
+            'Món chay':    ('Món chay',      'Món chay 🥗'),
+            'Cơm':         ('Cơm',           'Cơm 🍚'),
+        } %}
+        {% for key, (food_type, label) in pref_map.items() %}
+        <label class="hint-label">
+            <input type="checkbox"
+                   class="hint-cb"
+                   data-food-type="{{ food_type }}"
+                   {% if key in preferences %}checked{% endif %} />
+            {{ label }}
+        </label>
+        {% endfor %}
+    </div>
+
+    {% if not current_user %}
+    <p class="hint-login-note">
+        <a href="{{ url_for('login') }}">Đăng nhập</a> để lưu sở thích.
+    </p>
+    {% endif %}
+
+    <div class="hint-actions">
+        <button class="btn btn--primary btn--sm" id="apply-hint-btn">Áp dụng bộ lọc</button>
+        <button class="btn btn--outline btn--sm" id="reset-hint-btn">Đặt lại</button>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+    // Đọc toàn bộ dữ liệu quán
+    const ALL = JSON.parse(document.getElementById('restaurants-data').textContent);
+
+    // Template 1 thẻ quán ngang
+    function cardHTML(r) {
+        const emoji = {'Món nước':'🍜','Lẩu & Nướng':'🍲','Hải sản':'🦞',
+                       'Ăn vặt':'🥢','Cơm':'🍚','Món chay':'🥗'}[r.food_type] || '🍽';
+        const priceClass = r.price_range === 'Bình dân'
+            ? 'card-status--open'
+            : (r.price_range === 'Tầm trung' ? '' : '');
+        const priceStyle = r.price_range === 'Bình dân'
+            ? 'background:#e8f5e9;color:#2e7d32'
+            : (r.price_range === 'Tầm trung' ? 'background:#e3f2fd;color:#1565c0' : 'background:#f3e5f5;color:#6a1b9a');
+        const featured = r.is_featured
+            ? `<span class="card-featured">★ Nổi bật</span>` : '';
+        return `
+        <a href="/restaurants/${r.id}" class="restaurant-card-h" aria-label="${r.name}">
+            <div class="card-img">${emoji}</div>
+            <div class="card-body">
+                <div class="card-name">${r.name} ${featured}</div>
+                <div class="card-meta">
+                    <span class="card-rating">★ ${r.rating.toFixed(1)}</span>
+                    <span style="color:#ccc"> · </span>
+                    <span>${r.review_count} đánh giá</span>
+                    <span style="color:#ccc"> · </span>
+                    <span>${r.food_type}</span>
+                </div>
+                <div class="card-meta">📍 ${r.district}</div>
+                <div>
+                    <span class="card-status" style="${priceStyle}">${r.price_range}</span>
+                    <span class="card-status card-status--open" style="margin-left:.3rem">Đang mở cửa</span>
+                </div>
+            </div>
+        </a>`;
+    }
+
+    function renderList(list) {
+        const container = document.getElementById('restaurant-list');
+        const badge     = document.getElementById('hint-count-badge');
+        if (!container) return;
+        if (list.length === 0) {
+            container.innerHTML = '<p style="color:#999;padding:1rem;">Không tìm thấy quán phù hợp.</p>';
+        } else {
+            container.innerHTML = list.map(cardHTML).join('');
+        }
+        // Cập nhật badge số địa điểm
+        document.querySelectorAll('.count-badge').forEach(el => {
+            el.textContent = list.length + ' địa điểm';
+        });
+    }
+
+    // Nút Áp dụng
+    document.getElementById('apply-hint-btn').addEventListener('click', function () {
+        const checked = [...document.querySelectorAll('.hint-cb:checked')]
+            .map(cb => cb.dataset.foodType);
+        if (checked.length === 0) {
+            renderList(ALL);
+        } else {
+            renderList(ALL.filter(r => checked.includes(r.food_type)));
+        }
+        // Đóng hộp sau khi áp dụng
+        document.getElementById('personal-hint-box').classList.add('hidden');
+    });
+
+    // Nút Đặt lại
+    document.getElementById('reset-hint-btn').addEventListener('click', function () {
+        document.querySelectorAll('.hint-cb').forEach(cb => { cb.checked = false; });
+        renderList(ALL);
+    });
+
+    // Nút đóng X
+    document.getElementById('hint-close-btn').addEventListener('click', function () {
+        document.getElementById('personal-hint-box').classList.add('hidden');
+    });
+})();
+</script>
+{% endblock %}

@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+{% block title %}Liên hệ — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="contact-page">
+
+    <!-- Hero -->
+    <div class="contact-hero">
+        <div class="container">
+            <h1>📬 Liên hệ & Góp ý</h1>
+            <p>Có ý kiến, góp ý hoặc muốn hợp tác? Nhóm mình luôn sẵn lòng lắng nghe!</p>
+        </div>
+    </div>
+
+    <div class="container contact-layout">
+
+        <!-- Thông tin liên hệ -->
+        <div class="contact-info">
+            <h2>Thông tin liên hệ</h2>
+
+            <div class="contact-card">
+                <div class="contact-icon">📧</div>
+                <div>
+                    <strong>Email</strong>
+                    <p><a href="mailto:nnhatkhoa026@gmail.com">nnhatkhoa026@gmail.com</a></p>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">📞</div>
+                <div>
+                    <strong>Số điện thoại</strong>
+                    <!-- TODO: nhóm điền SĐT thật vào đây -->
+                    <p><a href="tel:0900000000">0900 000 000</a></p>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">📍</div>
+                <div>
+                    <strong>Địa chỉ</strong>
+                    <!-- TODO: nhóm điền địa chỉ thật vào đây -->
+                    <p>TP. Hồ Chí Minh, Việt Nam</p>
+                </div>
+            </div>
+
+            <div class="contact-card">
+                <div class="contact-icon">⏰</div>
+                <div>
+                    <strong>Giờ phản hồi</strong>
+                    <p>Thứ 2 – Thứ 6: 8:00 – 17:00</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Form góp ý -->
+        <div class="contact-form-wrap">
+            <h2>Gửi góp ý cho chúng mình</h2>
+
+            {% if sent %}
+            <div class="auth-alert auth-alert--success">
+                ✅ Cảm ơn bạn đã góp ý! Chúng mình sẽ phản hồi sớm nhất có thể.
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{{ url_for('contact') }}" class="contact-form">
+                <div class="form-group">
+                    <label for="c_name">Họ và tên</label>
+                    <input type="text" id="c_name" name="name"
+                           placeholder="Nguyễn Văn A" required maxlength="100"
+                           value="{{ form.name if form else '' }}" />
+                </div>
+                <div class="form-group">
+                    <label for="c_email">Email</label>
+                    <input type="email" id="c_email" name="email"
+                           placeholder="example@email.com" required
+                           value="{{ form.email if form else '' }}" />
+                </div>
+                <div class="form-group">
+                    <label for="c_subject">Chủ đề</label>
+                    <select id="c_subject" name="subject">
+                        <option value="Góp ý giao diện">Góp ý giao diện</option>
+                        <option value="Báo lỗi">Báo lỗi</option>
+                        <option value="Đề xuất tính năng">Đề xuất tính năng</option>
+                        <option value="Hợp tác">Hợp tác</option>
+                        <option value="Khác">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="c_message">Nội dung</label>
+                    <textarea id="c_message" name="message" rows="5"
+                              placeholder="Chia sẻ ý kiến của bạn..."
+                              required maxlength="1000">{{ form.message if form else '' }}</textarea>
+                </div>
+                <button type="submit" class="btn btn--primary" style="width:100%">
+                    📨 Gửi góp ý
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

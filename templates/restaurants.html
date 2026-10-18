@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+{% block title %}Danh sách quán ăn — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="restaurants-page">
+
+    <!-- ── Tiêu đề trang ── -->
+    <div class="page-hero container">
+        <h1>🍽 Quán ngon quanh bạn</h1>
+        <p>Khám phá {{ total }} địa điểm ẩm thực tại TP. Hồ Chí Minh</p>
+    </div>
+
+    <div class="container restaurants-layout">
+
+        <!-- ══════════════════════════════════════
+             CỘT TRÁI: BỘ LỌC (ảnh 01)
+        ══════════════════════════════════════ -->
+        <aside class="filter-panel">
+            <form method="GET" action="{{ url_for('restaurants') }}" id="filter-form">
+                <div class="filter-header">
+                    <span>🔍 BỘ LỌC TÌM KIẾM</span>
+                </div>
+
+                <!-- Loại món ăn -->
+                <div class="filter-group">
+                    <h4 class="filter-group-title">LOẠI MÓN ĂN</h4>
+                    {% for ft in all_food_types %}
+                    <label class="filter-check">
+                        <input type="checkbox" name="food_type" value="{{ ft }}"
+                               {% if ft in selected_food_types %}checked{% endif %} />
+                        {{ ft }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Mức giá -->
+                <div class="filter-group">
+                    <h4 class="filter-group-title">MỨC GIÁ</h4>
+                    {% for pr in [('Bình dân', 'Bình dân (<50k)'),
+                                  ('Tầm trung', 'Tầm trung (50k–200k)'),
+                                  ('Cao cấp', 'Cao cấp (>200k)')] %}
+                    <label class="filter-check">
+                        <input type="radio" name="price_range" value="{{ pr[0] }}"
+                               {% if selected_price_range == pr[0] %}checked{% endif %} />
+                        {{ pr[1] }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <!-- Khu vực -->
+                <div class="filter-group">
+                    <h4 class="filter-group-title">KHU VỰC</h4>
+                    {% for d in all_districts %}
+                    <label class="filter-check">
+                        <input type="checkbox" name="district" value="{{ d }}"
+                               {% if d in selected_districts %}checked{% endif %} />
+                        {{ d }}
+                    </label>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn--primary" style="width:100%">
+                    Áp dụng bộ lọc
+                </button>
+                {% if selected_food_types or selected_price_range or selected_districts %}
+                <a href="{{ url_for('restaurants') }}"
+                   class="btn btn--outline" style="width:100%;margin-top:.5rem;text-align:center">
+                    Xóa bộ lọc
+                </a>
+                {% endif %}
+            </form>
+        </aside>
+
+        <!-- ══════════════════════════════════════
+             CỘT PHẢI: LƯỚI THẺ QUÁN (ảnh 04)
+        ══════════════════════════════════════ -->
+        <section class="restaurant-grid-section">
+            <div class="grid-header">
+                <h2 class="section-title">
+                    Quán ngon quanh bạn
+                    <span class="count-badge">{{ total }} địa điểm</span>
+                </h2>
+            </div>
+
+            {% if restaurants %}
+            <div class="restaurant-grid">
+                {% for r in restaurants %}
+                <a href="{{ url_for('restaurant_detail', restaurant_id=r['id']) }}"
+                   class="restaurant-card-v" aria-label="{{ r['name'] }}">
+
+                    <!-- Ảnh + nhãn loại món -->
+                    <div class="card-v-img">
+                        {% if r['image_url'] %}
+                            <img src="{{ r['image_url'] }}" alt="{{ r['name'] }}" />
+                        {% else %}
+                            <span class="card-v-emoji">
+                                {{ {'Món nước':'🍜','Lẩu & Nướng':'🍲','Hải sản':'🦞',
+                                    'Ăn vặt':'🥢','Cơm':'🍚','Món chay':'🥗'}.get(r['food_type'], '🍽') }}
+                            </span>
+                        {% endif %}
+
+                        <!-- Nhãn nổi bật -->
+                        {% if r['is_featured'] %}
+                        <span class="card-v-badge-featured">★ Nổi bật</span>
+                        {% endif %}
+
+                        <!-- Nhãn loại món -->
+                        <span class="card-v-badge-type">{{ r['food_type']|upper }}</span>
+                    </div>
+
+                    <!-- Thông tin quán -->
+                    <div class="card-v-body">
+                        <div class="card-v-name">{{ r['name'] }}</div>
+
+                        <div class="card-v-meta">
+                            <span class="card-v-rating">★ {{ '%.1f'|format(r['rating']) }}</span>
+                            <span class="sep">·</span>
+                            <span>{{ r['review_count'] }} đánh giá</span>
+                        </div>
+
+                        <div class="card-v-meta">
+                            <span>{{ r['food_type'] }}</span>
+                            <span class="sep">·</span>
+                            <span>📍 {{ r['district'] }}</span>
+                        </div>
+
+                        <div class="card-v-footer">
+                            <span class="card-v-status card-v-status--open">Đang mở cửa</span>
+                            <span class="card-v-price">
+                                {{ '{:,}'.format(r['price_min']) }}đ –
+                                {{ '{:,}'.format(r['price_max']) }}đ
+                            </span>
+                        </div>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">🔍</div>
+                <h3>Không tìm thấy quán nào</h3>
+                <p>Thử bỏ bớt tiêu chí lọc để xem thêm kết quả nhé.</p>
+                <a href="{{ url_for('restaurants') }}" class="btn btn--primary">Xem tất cả quán</a>
+            </div>
+            {% endif %}
+        </section>
+
+    </div><!-- /restaurants-layout -->
+</div>
+{% endblock %}

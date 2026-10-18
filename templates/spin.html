@@ -1,0 +1,225 @@
+{% extends "base.html" %}
+{% block title %}Vòng quay Hôm nay ăn gì? — Trùm Đớp VN{% endblock %}
+
+{% block content %}
+<div class="spin-page">
+    <div class="container">
+        <h1 class="spin-title">🎡 VÒNG QUAY: HÔM NAY ĂN GÌ?</h1>
+
+        <!-- Chọn bữa -->
+        <div class="meal-btns">
+            {% for meal, icon in [('Ăn sáng','🌅'),('Ăn trưa','☀️'),('Ăn tối','🌙'),('Ăn vặt','🍡')] %}
+            <button class="meal-btn {% if loop.first %}active{% endif %}"
+                    data-meal="{{ meal }}">
+                <span class="meal-icon">{{ icon }}</span>
+                {{ meal }}
+            </button>
+            {% endfor %}
+        </div>
+
+        <div class="spin-columns">
+
+            <!-- Vòng quay -->
+            <div class="wheel-wrap">
+                <canvas id="spin-wheel" width="380" height="380"
+                        aria-label="Vòng quay món ăn"></canvas>
+                <button class="spin-go-btn" id="spin-btn">QUAY!</button>
+            </div>
+
+            <!-- Khung gợi ý -->
+            <div class="spin-suggest">
+                <div class="suggest-header">
+                    <h3>🍽 Lấy gợi ý quán</h3>
+                    <p class="suggest-meal-label">Bạn đang chọn:
+                        <strong id="selected-meal-label">Ăn sáng</strong>
+                    </p>
+                </div>
+
+                <div class="suggest-filters">
+                    <div class="suggest-filter-group">
+                        <label>Khoảng cách</label>
+                        <div class="radio-pills">
+                            <label class="rpill active"><input type="radio" name="distance" value="3" checked/>Dưới 3km</label>
+                            <label class="rpill"><input type="radio" name="distance" value="5"/>Dưới 5km</label>
+                        </div>
+                    </div>
+                    <div class="suggest-filter-group">
+                        <label>Mức giá</label>
+                        <div class="radio-pills">
+                            <label class="rpill active"><input type="radio" name="price" value="Bình dân" checked/>Bình dân</label>
+                            <label class="rpill"><input type="radio" name="price" value="Tầm trung"/>Tầm trung</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="suggest-result" id="suggest-result">
+                    <p class="suggest-hint">Hãy nhấn <strong>QUAY!</strong> để tìm món ăn 🎯</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// ── Dữ liệu quán từ server ──────────────────────────────
+const ALL_RESTAURANTS = {{ restaurants_json|safe }};
+
+// ── Danh sách món theo bữa ──────────────────────────────
+const MEALS = {
+    'Ăn sáng': ['Phở bò','Bánh mì','Hủ tiếu','Bún bò','Cơm tấm','Bánh cuốn','Xôi'],
+    'Ăn trưa': ['Cơm tấm','Bún bò','Phở bò','Hải sản','Lẩu nướng','Cơm văn phòng','Mì xào'],
+    'Ăn tối':  ['Lẩu nướng','Hải sản','Phở bò','Bún chả','Cơm tấm','Lẩu dê','Hủ tiếu'],
+    'Ăn vặt':  ['Bánh mì','Chè','Trà sữa','Kem','Bánh tráng','Xúc xích','Gỏi cuốn'],
+};
+
+let currentMeal   = 'Ăn sáng';
+let isSpinning    = false;
+let currentAngle  = 0;
+const canvas      = document.getElementById('spin-wheel');
+const ctx         = canvas.getContext('2d');
+const spinBtn     = document.getElementById('spin-btn');
+const COLORS      = ['#FF6A6A','#ff9a9a','#ffb347','#ffe08a','#98d8c8','#87ceeb','#dda0dd'];
+
+function getSegments() { return MEALS[currentMeal] || MEALS['Ăn sáng']; }
+
+function drawWheel(angle) {
+    const segs = getSegments();
+    const n    = segs.length;
+    const arc  = (2 * Math.PI) / n;
+    const cx   = canvas.width  / 2;
+    const cy   = canvas.height / 2;
+    const r    = cx - 10;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    segs.forEach((seg, i) => {
+        const start = angle + i * arc;
+        const end   = start + arc;
+        // Slice
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.arc(cx, cy, r, start, end);
+        ctx.closePath();
+        ctx.fillStyle = COLORS[i % COLORS.length];
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        // Text
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(start + arc / 2);
+        ctx.textAlign = 'right';
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 13px Nunito, sans-serif';
+        ctx.shadowColor = 'rgba(0,0,0,.3)';
+        ctx.shadowBlur  = 3;
+        ctx.fillText(seg, r - 12, 5);
+        ctx.restore();
+    });
+
+    // Tâm
+    ctx.beginPath();
+    ctx.arc(cx, cy, 28, 0, 2 * Math.PI);
+    ctx.fillStyle = '#fff';
+    ctx.fill();
+    ctx.strokeStyle = '#FF6A6A';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Kim — đầu nhọn chỉ vào trong vòng quay (xuống dưới)
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy - r + 5);   // góc trái (ngoài)
+    ctx.lineTo(cx + 10, cy - r + 5);   // góc phải (ngoài)
+    ctx.lineTo(cx, cy - r + 30);       // đầu nhọn (trong)
+    ctx.closePath();
+    ctx.fillStyle = '#FF6A6A';
+    ctx.fill();
+}
+
+drawWheel(currentAngle);
+
+// Chọn bữa
+document.querySelectorAll('.meal-btn').forEach(btn => {
+    btn.addEventListener('click', function () {
+        document.querySelectorAll('.meal-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentMeal = this.dataset.meal;
+        document.getElementById('selected-meal-label').textContent = currentMeal;
+        drawWheel(currentAngle);
+        document.getElementById('suggest-result').innerHTML =
+            '<p class="suggest-hint">Hãy nhấn <strong>QUAY!</strong> để tìm món ăn 🎯</p>';
+    });
+});
+
+// Quay
+spinBtn.addEventListener('click', function () {
+    if (isSpinning) return;
+    isSpinning = true;
+    spinBtn.disabled = true;
+
+    const segs     = getSegments();
+    const n        = segs.length;
+    const arc      = (2 * Math.PI) / n;
+    const extraSpin = (Math.random() * 8 + 5) * 2 * Math.PI; // 5–13 vòng
+    const target   = currentAngle + extraSpin;
+    const duration = 4000;
+    const start    = performance.now();
+    const fromAngle= currentAngle;
+
+    function easeOut(t) { return 1 - Math.pow(1 - t, 3); }
+
+    function animate(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        currentAngle = fromAngle + extraSpin * easeOut(progress);
+        drawWheel(currentAngle);
+        if (progress < 1) {
+            requestAnimationFrame(animate);
+        } else {
+            isSpinning = false;
+            spinBtn.disabled = false;
+            // Tính ô kết quả (kim ở đỉnh = -π/2)
+            const norm = ((currentAngle % (2*Math.PI)) + 2*Math.PI) % (2*Math.PI);
+            const idx  = Math.floor(((2*Math.PI - norm + Math.PI*1.5) % (2*Math.PI)) / arc) % n;
+            showResult(segs[idx]);
+        }
+    }
+    requestAnimationFrame(animate);
+});
+
+function showResult(food) {
+    const price    = document.querySelector('input[name="price"]:checked')?.value || '';
+    const matched  = ALL_RESTAURANTS.filter(r =>
+        (!price || r.price_range === price)
+    ).slice(0, 3);
+
+    let html = `<div class="result-food">🎉 Kết quả: <strong>${food}</strong></div>`;
+    html += '<h4 style="margin:.75rem 0 .5rem;font-size:.88rem;color:#777">GỢI Ý QUÁN NGON CHO BẠN:</h4>';
+
+    if (matched.length) {
+        matched.forEach(r => {
+            html += `<a href="/restaurants/${r.id}" class="suggest-card">
+                <span class="suggest-card-name">${r.name}</span>
+                <span class="suggest-card-meta">★${r.rating} · ${r.district}</span>
+            </a>`;
+        });
+    } else {
+        html += '<p style="color:#999;font-size:.85rem">Không tìm thấy quán phù hợp.</p>';
+    }
+
+    document.getElementById('suggest-result').innerHTML = html;
+}
+
+// Radio pills toggle active
+document.querySelectorAll('.rpill input').forEach(input => {
+    input.addEventListener('change', function () {
+        document.querySelectorAll(`.rpill input[name="${this.name}"]`).forEach(i => {
+            i.closest('.rpill').classList.toggle('active', i === this);
+        });
+    });
+});
+</script>
+{% endblock %}

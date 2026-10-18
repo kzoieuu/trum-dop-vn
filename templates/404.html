@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Không tìm thấy trang — Trùm Đớp VN{% endblock %}
+{% block content %}
+<div style="text-align:center;padding:5rem 1rem;">
+    <div style="font-size:5rem;margin-bottom:1rem">🍜</div>
+    <h1 style="font-size:2rem;font-weight:900;margin-bottom:.5rem">Trang không tồn tại</h1>
+    <p style="color:#888;margin-bottom:1.5rem">Có vẻ trang bạn tìm đã... bị ăn mất rồi!</p>
+    <a href="{{ url_for('home') }}" class="btn btn--primary">← Về Trang chủ</a>
+</div>
+{% endblock %}
