@@ -71,15 +71,23 @@
             </form>
         </aside>
 
-        <!-- ══════════════════════════════════════
-             CỘT PHẢI: LƯỚI THẺ QUÁN (ảnh 04)
-        ══════════════════════════════════════ -->
+        <!-- ══ CỘT PHẢI: LƯỚI THẺ QUÁN (ảnh 04) ══ -->
         <section class="restaurant-grid-section">
             <div class="grid-header">
                 <h2 class="section-title">
-                    Quán ngon quanh bạn
+                    {% if keyword %}
+                        Kết quả tìm kiếm: "{{ keyword }}"
+                    {% else %}
+                        Quán ngon quanh bạn
+                    {% endif %}
                     <span class="count-badge">{{ total }} địa điểm</span>
                 </h2>
+                <!-- Ô tìm kiếm trong trang danh sách -->
+                <form class="list-search-form" method="GET" action="{{ url_for('restaurants') }}">
+                    <input type="text" name="q" value="{{ keyword }}"
+                           placeholder="Tìm tên quán, loại món..." />
+                    <button type="submit" class="btn btn--primary btn--sm">🔍 Tìm</button>
+                </form>
             </div>
 
             {% if restaurants %}

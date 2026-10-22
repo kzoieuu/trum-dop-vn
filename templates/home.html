@@ -11,12 +11,12 @@
     <div class="container">
         <h1 class="hero-title">Hôm nay ăn gì? 🍜</h1>
         <p class="hero-sub">Khám phá hàng trăm quán ngon tại TP. Hồ Chí Minh</p>
-        <div class="search-bar search-bar--large">
+        <form class="search-bar search-bar--large" action="{{ url_for('restaurants') }}" method="GET">
             <span class="search-icon">🔍</span>
-            <input type="text" id="hero-search-input"
+            <input type="text" name="q" id="hero-search-input"
                    placeholder="Tìm món ăn, nhà hàng, quán cafe..." />
-            <button class="btn btn--primary">Tìm kiếm</button>
-        </div>
+            <button type="submit" class="btn btn--primary">Tìm kiếm</button>
+        </form>
 
         <!-- Nút lọc nhanh -->
         <div class="quick-filters">

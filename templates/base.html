@@ -25,10 +25,10 @@
         </a>
 
         <!-- Ô tìm kiếm (ảnh 01–02) -->
-        <div class="navbar-search">
-            <input type="text" placeholder="Tìm món ăn, nhà hàng, quán cafe..." />
-            <button class="btn-search" aria-label="Tìm kiếm">🔍</button>
-        </div>
+        <form class="navbar-search" action="{{ url_for('restaurants') }}" method="GET">
+            <input type="text" name="q" placeholder="Tìm món ăn, nhà hàng..." />
+            <button type="submit" class="btn-search" aria-label="Tìm kiếm">🔍</button>
+        </form>
 
         <!-- Menu chính -->
         <nav class="navbar-menu" role="navigation" aria-label="Menu chính">
@@ -67,7 +67,7 @@
 
         <!-- Vị trí + Tài khoản -->
         <div class="navbar-actions">
-            <span class="navbar-location">📍 TP. Hồ Chí Minh</span>
+            <a href="{{ url_for('restaurants') }}" class="navbar-location">📍 TP. Hồ Chí Minh</a>
             {% if current_user %}
                 <div class="navbar-user-menu">
                     <button class="navbar-user-btn" id="user-menu-btn">

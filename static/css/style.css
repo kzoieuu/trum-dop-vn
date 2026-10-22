@@ -1862,3 +1862,21 @@ ul { list-style: none; }
     text-align: center;
 }
 .hint-login-note a { color: var(--color-primary); font-weight: 700; }
+
+/* ── Form tìm kiếm trong trang danh sách ── */
+.list-search-form {
+    display: flex;
+    gap: .5rem;
+    align-items: center;
+}
+.list-search-form input {
+    padding: .45rem .9rem;
+    border: 1.5px solid var(--color-border);
+    border-radius: var(--radius-full);
+    font-family: inherit;
+    font-size: .875rem;
+    outline: none;
+    width: 220px;
+    transition: border-color var(--transition);
+}
+.list-search-form input:focus { border-color: var(--color-primary); }

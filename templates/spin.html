@@ -191,10 +191,27 @@ spinBtn.addEventListener('click', function () {
 });
 
 function showResult(food) {
+    const FOOD_TYPE_MAP = {
+        'Phở bò':'Món nước','Bún bò':'Món nước','Hủ tiếu':'Món nước',
+        'Bún chả':'Món nước','Bánh cuốn':'Ăn vặt','Cơm tấm':'Cơm',
+        'Cơm văn phòng':'Cơm','Mì xào':'Cơm','Bánh mì':'Ăn vặt',
+        'Chè':'Ăn vặt','Trà sữa':'Ăn vặt','Kem':'Ăn vặt',
+        'Bánh tráng':'Ăn vặt','Xúc xích':'Ăn vặt','Gỏi cuốn':'Ăn vặt',
+        'Xôi':'Ăn vặt','Lẩu nướng':'Lẩu & Nướng','Lẩu dê':'Lẩu & Nướng',
+        'Hải sản':'Hải sản',
+    };
+
     const price    = document.querySelector('input[name="price"]:checked')?.value || '';
-    const matched  = ALL_RESTAURANTS.filter(r =>
-        (!price || r.price_range === price)
-    ).slice(0, 3);
+    const foodType = FOOD_TYPE_MAP[food] || '';
+
+    let matched = ALL_RESTAURANTS.filter(r =>
+        (!foodType || r.food_type === foodType) &&
+        (!price    || r.price_range === price)
+    );
+    if (matched.length === 0) {
+        matched = ALL_RESTAURANTS.filter(r => !price || r.price_range === price);
+    }
+    matched = matched.slice(0, 3);
 
     let html = `<div class="result-food">🎉 Kết quả: <strong>${food}</strong></div>`;
     html += '<h4 style="margin:.75rem 0 .5rem;font-size:.88rem;color:#777">GỢI Ý QUÁN NGON CHO BẠN:</h4>';
@@ -203,7 +220,7 @@ function showResult(food) {
         matched.forEach(r => {
             html += `<a href="/restaurants/${r.id}" class="suggest-card">
                 <span class="suggest-card-name">${r.name}</span>
-                <span class="suggest-card-meta">★${r.rating} · ${r.district}</span>
+                <span class="suggest-card-meta">★${r.rating} · ${r.district} · ${r.food_type}</span>
             </a>`;
         });
     } else {

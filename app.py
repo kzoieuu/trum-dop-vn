@@ -113,9 +113,15 @@ def restaurants():
     food_types  = request.args.getlist('food_type')
     price_range = request.args.get('price_range', '')
     districts   = request.args.getlist('district')
+    keyword     = request.args.get('q', '').strip()
 
     sql    = 'SELECT * FROM restaurants WHERE 1=1'
     params = []
+
+    if keyword:
+        sql += ' AND (name LIKE ? OR food_type LIKE ? OR address LIKE ?)'
+        kw = f'%{keyword}%'
+        params.extend([kw, kw, kw])
 
     if food_types:
         placeholders = ','.join('?' * len(food_types))
@@ -148,6 +154,7 @@ def restaurants():
                            selected_food_types=food_types,
                            selected_price_range=price_range,
                            selected_districts=districts,
+                           keyword=keyword,
                            all_food_types=all_food_types,
                            all_districts=all_districts)
 
