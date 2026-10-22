@@ -392,3 +392,6 @@ def page_not_found(e):
 if __name__ == '__main__':
     init_db()
     app.run(debug=True)
+else:
+    # Chạy trên production server (gunicorn)
+    init_db()
