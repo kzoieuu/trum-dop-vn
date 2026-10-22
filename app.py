@@ -395,3 +395,13 @@ if __name__ == '__main__':
 else:
     # Chạy trên production server (gunicorn)
     init_db()
+    # Nạp dữ liệu mẫu nếu chưa có
+    from seed import seed
+    from database import get_db
+    try:
+        db = get_db()
+        count = db.execute('SELECT COUNT(*) FROM restaurants').fetchone()[0]
+        if count == 0:
+            seed()
+    except Exception:
+        seed()
