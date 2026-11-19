@@ -2,7 +2,7 @@
 
 **Dự án:** Trùm Đớp VN  
 **Tổng thời gian:** 3 tuần (mỗi buổi ~2–3 giờ)  
-**Nhóm:** 7 thành viên  
+**Nhóm:** Nguyễn Nhật Khoa (Nhóm trưởng), Nguyễn Quỳnh Anh, Đỗ Bội Di, Nguyễn Thành Ngọc Hân, Huỳnh Quốc Nam Phương, Nguyễn Phạm Dương Anh, Mai Ánh Phương
 
 > Mỗi task đủ nhỏ để làm xong trong 1 buổi.  
 > Ghi tên người phụ trách vào cột "Phụ trách" trước khi bắt đầu.
