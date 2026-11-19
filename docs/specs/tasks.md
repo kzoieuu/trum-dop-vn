@@ -96,11 +96,11 @@
 
 | Thành viên | Task phụ trách |
 |---|---|
-| Nguyễn Thành Ngọc Hân | Task 01, Task 06 |
-| Huỳnh Quốc Nam Phương | Task 02, Task 07 |
-| Đỗ Bội Di | Task 03, Task 08 |
-| Nguyễn Quỳnh Anh | Task 04, Task 09 |
-| Mai Ánh Phương | Task 05, Task 10 |
+| Nguyễn Thành Ngọc Hân | Task 01, Task 02 |
+| Huỳnh Quốc Nam Phương | Task 03, Task 04 |
+| Đỗ Bội Di | Task 05, Task 06 |
+| Nguyễn Quỳnh Anh | Task 07, Task 08 |
+| Mai Ánh Phương | Task 09, Task 10 |
 | Nguyễn Phạm Dương Anh | Task 11, Task 12 |
 | Nguyễn Nhật Khoa | Task 13, Task 14 |
 
