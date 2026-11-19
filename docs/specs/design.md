@@ -259,3 +259,44 @@ OPENAI_API_KEY=your_openai_api_key_here
 ```
 openai==1.40.0
 ```
+
+---
+
+## 8. Kết quả kiểm tra dữ liệu SQLite trên Render
+
+**Ngày kiểm tra:** 16–22/11/2026  
+**Người kiểm tra:** Nguyễn Nhật Khoa  
+
+### Vấn đề phát hiện
+Render sử dụng **ephemeral filesystem** (bộ nhớ tạm thời) — toàn bộ file trên server bị xóa sau mỗi lần deploy lại hoặc khởi động lại. Do đó file `trum_dop.db` (SQLite) **không được giữ lại** giữa các lần deploy.
+
+**Triệu chứng:** Sau khi deploy, vào web thấy "0 địa điểm", danh sách quán trống.
+
+### Giải pháp đã áp dụng
+Thêm đoạn code vào `app.py` để tự động khởi tạo database và nạp dữ liệu mẫu mỗi khi server khởi động:
+
+```python
+else:
+    # Chạy trên production server (gunicorn)
+    init_db()
+    from seed import seed
+    from database import get_db
+    try:
+        db = get_db()
+        count = db.execute('SELECT COUNT(*) FROM restaurants').fetchone()[0]
+        if count == 0:
+            seed()
+    except Exception:
+        seed()
+```
+
+### Kết quả sau khi áp dụng
+- ✅ Mỗi lần server khởi động, database tự tạo lại và nạp đủ 28 quán mẫu
+- ✅ Web hoạt động bình thường sau mỗi lần deploy
+- ⚠️ Dữ liệu người dùng (tài khoản, đánh giá) sẽ bị mất sau mỗi lần deploy
+
+### Lưu ý cho tính năng AI tóm tắt
+Bảng `ai_summaries` cũng sẽ bị xóa sau mỗi lần deploy. Cần thêm logic tạo lại bảng này vào `init_db()` trước khi triển khai tính năng AI.
+
+### Khuyến nghị dài hạn
+Nếu cần lưu dữ liệu lâu dài (tài khoản, đánh giá), nên chuyển sang dùng **PostgreSQL** (Render hỗ trợ miễn phí) thay vì SQLite.
