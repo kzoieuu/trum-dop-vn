@@ -96,12 +96,12 @@
 
 | Thành viên | Task phụ trách |
 |---|---|
-| Thành viên 1 | Task 01, Task 06 |
-| Thành viên 2 | Task 02, Task 07 |
-| Thành viên 3 | Task 03, Task 08 |
-| Thành viên 4 | Task 04, Task 09 |
-| Thành viên 5 | Task 05, Task 10 |
-| Thành viên 6 | Task 11, Task 12 |
-| Thành viên 7 | Task 13, Task 14 |
+| Nguyễn Thành Ngọc Hân | Task 01, Task 06 |
+| Huỳnh Quốc Nam Phương | Task 02, Task 07 |
+| Đỗ Bội Di | Task 03, Task 08 |
+| Nguyễn Quỳnh Anh | Task 04, Task 09 |
+| Nguyễn Nhật Khoa | Task 05, Task 10 |
+| Nguyễn Phạm Dương Anh | Task 11, Task 12 |
+| Mai Ánh Phương | Task 13, Task 14 |
 
 > Điền tên thật của từng bạn vào bảng trên trước khi bắt đầu tuần 1.
