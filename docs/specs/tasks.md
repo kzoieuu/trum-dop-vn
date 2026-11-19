@@ -33,7 +33,7 @@
 - **Xong khi:** Dùng trình duyệt hoặc curl truy cập `/restaurants/1/summary`, nhận về JSON hợp lệ gồm `pros` và `cons`.
 
 ### Task 05 — Xử lý lỗi API (timeout, hết quota, key sai)
-- **Phụ trách:** _(Nguyễn Nhật Khoa)_
+- **Phụ trách:** _(Mai Ánh Phương)_
 - **Mô tả:** Bọc toàn bộ lệnh gọi OpenAI trong `try/except`, trả về `{"error": "..."}` khi lỗi. Thêm timeout 15 giây cho request.
 - **Xong khi:** Thử truyền key sai → route trả về JSON lỗi thay vì crash server.
 
@@ -62,7 +62,7 @@
 - **Xong khi:** Thử 3 trường hợp: quán có đánh giá, quán không có đánh giá, cắt mạng → đều hiển thị đúng thông báo tương ứng.
 
 ### Task 10 — Nút "🔄 Làm mới tóm tắt"
-- **Phụ trách:** _(Nguyễn Nhật Khoa)_
+- **Phụ trách:** _(Mai Ánh Phương)_
 - **Mô tả:** Gán sự kiện click cho nút "🔄 Làm mới": gọi lại `loadSummary(true)` với tham số `force=1`, route xóa cache và gọi API mới.
 - **Xong khi:** Bấm "Làm mới" → khung hiện loading → sau vài giây cập nhật tóm tắt mới.
 
@@ -81,12 +81,12 @@
 - **Xong khi:** Không tìm thấy key ở bất kỳ đâu ngoài file `.env` trên máy local.
 
 ### Task 13 — Kiểm thử trên điện thoại và nhiều trình duyệt
-- **Phụ trách:** _(Mai Ánh Phương)_
+- **Phụ trách:** _(Nguyễn Nhật Khoa)_
 - **Mô tả:** Mở web trên Chrome, Edge và điện thoại (dùng link Render). Kiểm tra khung tóm tắt hiển thị đúng, không bị vỡ layout.
 - **Xong khi:** Giao diện đẹp và chức năng hoạt động đúng trên cả 3 môi trường.
 
 ### Task 14 — Push code lên GitHub và deploy Render
-- **Phụ trách:** _(Mai Ánh Phương)_
+- **Phụ trách:** _(Nguyễn Nhật Khoa)_
 - **Mô tả:** Commit toàn bộ thay đổi, push lên GitHub. Thêm `OPENAI_API_KEY` vào Environment Variables trên Render (không commit key). Chờ Render deploy lại và kiểm tra web chạy đúng.
 - **Xong khi:** Web tại `https://trum-dop-vn.onrender.com` hiển thị tóm tắt AI hoạt động đúng.
 
@@ -100,8 +100,8 @@
 | Huỳnh Quốc Nam Phương | Task 02, Task 07 |
 | Đỗ Bội Di | Task 03, Task 08 |
 | Nguyễn Quỳnh Anh | Task 04, Task 09 |
-| Nguyễn Nhật Khoa | Task 05, Task 10 |
+| Mai Ánh Phương | Task 05, Task 10 |
 | Nguyễn Phạm Dương Anh | Task 11, Task 12 |
-| Mai Ánh Phương | Task 13, Task 14 |
+| Nguyễn Nhật Khoa | Task 13, Task 14 |
 
 > Điền tên thật của từng bạn vào bảng trên trước khi bắt đầu tuần 1.
